@@ -393,6 +393,12 @@ export default function AdminDashboardClient() {
                           링크 복사
                         </button>
                         <button
+                          onClick={() => navigator.clipboard.writeText(`${window.location.origin}/${demo.access_code}?bg=gray`)}
+                          className="text-gray-600 hover:text-gray-900 text-xs"
+                        >
+                          회색 배경
+                        </button>
+                        <button
                           onClick={() => {
                             setEditingDemo(demo)
                             setEditDemoMemo(demo.memo || '')

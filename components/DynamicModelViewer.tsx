@@ -9,6 +9,7 @@ interface DynamicModelViewerProps {
   modelName: string
   demoId?: string
   accessCode?: string
+  backgroundColor?: 'black' | 'gray'
 }
 
 declare global {
@@ -25,7 +26,8 @@ export default function DynamicModelViewer({
   isKtx2, 
   modelName,
   demoId,
-  accessCode
+  accessCode,
+  backgroundColor = 'black'
 }: DynamicModelViewerProps) {
   const modelViewerRef = useRef<any>(null)
   const [loadingProgress, setLoadingProgress] = useState(0)
@@ -122,12 +124,20 @@ export default function DynamicModelViewer({
     }
   }, [src])
 
+  // 배경색 설정
+  const getBackgroundStyle = () => {
+    if (backgroundColor === 'gray') {
+      return 'linear-gradient(135deg, #2d2d2d 0%, #4a4a4a 100%)'
+    }
+    return 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)'
+  }
+
   return (
     <div style={{ 
       width: '100%', 
       height: '100vh', 
       position: 'relative',
-      background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)'
+      background: getBackgroundStyle()
     }}>
         {/* 모델명 표시 - 모바일 최적화 */}
         <div style={{

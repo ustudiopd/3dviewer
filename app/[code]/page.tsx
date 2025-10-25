@@ -20,10 +20,14 @@ interface PageProps {
   params: Promise<{
     code: string
   }>
+  searchParams: Promise<{
+    bg?: string
+  }>
 }
 
-export default async function ModelViewerPage({ params }: PageProps) {
+export default async function ModelViewerPage({ params, searchParams }: PageProps) {
   const { code } = await params
+  const { bg } = await searchParams
 
   // favicon.ico 요청 필터링 (대소문자 구분 없이)
   if (code.toLowerCase() === 'favicon.ico') {
@@ -182,6 +186,9 @@ export default async function ModelViewerPage({ params }: PageProps) {
     // 접속 로그 수집 (클라이언트에서 실행)
     console.log('접속 로그 수집 시작')
 
+    // URL 파라미터에서 배경색 확인 (예: ?bg=gray)
+    const backgroundColor = bg === 'gray' ? 'gray' : 'black'
+
     return (
       <DynamicModelViewer
         src={signedUrlData.signedUrl}
@@ -190,6 +197,7 @@ export default async function ModelViewerPage({ params }: PageProps) {
         modelName={demo.model.name}
         demoId={demo.id}
         accessCode={demo.access_code}
+        backgroundColor={backgroundColor}
       />
     )
   } catch (error) {
