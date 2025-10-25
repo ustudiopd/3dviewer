@@ -18,6 +18,7 @@ export interface Demo {
   created_by: string;
   access_count: number;
   last_accessed_at: string | null;
+  memo: string | null;
   created_at: string;
   updated_at: string;
   model?: Model;

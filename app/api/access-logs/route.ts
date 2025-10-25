@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServer } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const demoId = searchParams.get('demoId')
+    const url = new URL(request.url)
+    const demoId = url.searchParams.get('demoId')
 
     if (!demoId) {
       return NextResponse.json({ error: 'demoId is required' }, { status: 400 })
+    }
+
+    if (!supabaseServer) {
+      return NextResponse.json({ error: 'Supabase service role key not configured' }, { status: 500 })
     }
 
     // 접속 로그 조회

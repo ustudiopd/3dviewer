@@ -17,13 +17,13 @@ const DynamicModelViewer = dynamic(() => import('@/components/DynamicModelViewer
 })
 
 interface PageProps {
-  params: {
+  params: Promise<{
     code: string
-  }
+  }>
 }
 
 export default async function ModelViewerPage({ params }: PageProps) {
-  const { code } = params
+  const { code } = await params
 
   // favicon.ico 요청 필터링 (대소문자 구분 없이)
   if (code.toLowerCase() === 'favicon.ico') {

@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServer } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const { demoId, accessCode, userAgent } = await request.json()
 
     if (!demoId || !accessCode) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
+    if (!supabaseServer) {
+      return NextResponse.json({ error: 'Supabase service role key not configured' }, { status: 500 })
     }
 
     // 클라이언트 IP 주소 추출
