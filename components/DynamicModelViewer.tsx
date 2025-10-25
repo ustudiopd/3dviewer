@@ -127,9 +127,9 @@ export default function DynamicModelViewer({
   // 배경색 설정
   const getBackgroundStyle = () => {
     if (backgroundColor === 'gray') {
-      return 'linear-gradient(135deg, #2d2d2d 0%, #4a4a4a 100%)'
+      return '#0a0a0a' // 진한 회색 (솔리드)
     }
-    return 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)'
+    return '#0a0a0a' // 진한 회색 (솔리드) - 기본값도 동일하게
   }
 
   return (
