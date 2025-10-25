@@ -124,9 +124,9 @@ export default function DynamicModelViewer({
     }
   }, [src])
 
-  // 배경색 설정 - 진한 회색으로 고정
+  // 배경색 설정 - 회색으로 고정
   const getBackgroundStyle = () => {
-    return '#1a1a1a' // 진한 회색 (더 밝게)
+    return '#545454' // 회색
   }
 
   return (
@@ -337,7 +337,7 @@ export default function DynamicModelViewer({
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: '#000000'
+          backgroundColor: '#545454'
         }}
       />
     </div>
