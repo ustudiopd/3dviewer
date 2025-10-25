@@ -28,8 +28,11 @@ export default function AdminLoginClient() {
     setError('')
 
     try {
+      // admin 계정은 이메일 양식 예외 처리
+      const loginEmail = email === 'admin' ? 'admin@admin.com' : email
+      
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: loginEmail,
         password,
       })
 
@@ -60,16 +63,16 @@ export default function AdminLoginClient() {
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email" className="sr-only">
-                이메일
+                사용자명 또는 이메일
               </label>
               <input
                 id="email"
                 name="email"
-                type="email"
-                autoComplete="email"
+                type="text"
+                autoComplete="username"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="이메일 주소"
+                placeholder="사용자명 (admin) 또는 이메일 주소"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
