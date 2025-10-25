@@ -15,8 +15,8 @@ export default function AdminLayout({
   const router = useRouter()
 
   useEffect(() => {
-    // 현재 경로가 로그인 페이지인지 확인
-    const isLoginPage = window.location.pathname === '/admin/login'
+    // 현재 경로가 로그인 페이지인지 확인 (클라이언트에서만)
+    const isLoginPage = typeof window !== 'undefined' && window.location.pathname === '/admin/login'
     
     // 로그인 페이지인 경우 레이아웃 체크를 건너뛰고 바로 렌더링
     if (isLoginPage) {
@@ -59,8 +59,8 @@ export default function AdminLayout({
     return () => subscription.unsubscribe()
   }, [router])
 
-  // 로그인 페이지인 경우 레이아웃 없이 바로 렌더링
-  if (window.location.pathname === '/admin/login') {
+  // 로그인 페이지인 경우 레이아웃 없이 바로 렌더링 (클라이언트에서만)
+  if (typeof window !== 'undefined' && window.location.pathname === '/admin/login') {
     return <>{children}</>
   }
 

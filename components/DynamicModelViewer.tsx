@@ -239,7 +239,7 @@ export default function DynamicModelViewer({
               <strong style={{ color: '#ffffff' }}>🖱️ 우클릭:</strong> 이동
             </div>
             <div style={{ color: '#e0e0e0', lineHeight: '1.4' }}>
-              <strong style={{ color: '#ffffff' }}>📱 터치:</strong> 핀치
+              <strong style={{ color: '#ffffff' }}>📱 터치:</strong> 핀치 줌
             </div>
           </div>
         </div>
@@ -320,6 +320,13 @@ export default function DynamicModelViewer({
         environment-image="neutral"
         exposure="1"
         shadow-softness="0.5"
+        // 아이폰 최적화 설정
+        touch-action="pan-y"
+        interaction-policy="allow-when-focused"
+        auto-rotate-delay="0"
+        orientation-permission="deny"
+        draco-decoder-path="https://www.gstatic.com/draco/versioned/decoders/1.5.6/"
+        ktx2-decoder-path="https://cdn.jsdelivr.net/npm/three@0.150.0/examples/jsm/libs/basis/"
         style={{
           width: '100%',
           height: '100%',
