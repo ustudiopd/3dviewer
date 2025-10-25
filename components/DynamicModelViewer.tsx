@@ -124,9 +124,9 @@ export default function DynamicModelViewer({
     }
   }, [src])
 
-  // 배경색 설정 - 회색으로 고정
+  // 배경색 설정 - 그라데이션 배경
   const getBackgroundStyle = () => {
-    return '#545454' // 회색
+    return 'linear-gradient(135deg, #6b6b6b 0%, #3a3a3a 100%)' // 그라데이션
   }
 
   return (
@@ -325,7 +325,7 @@ export default function DynamicModelViewer({
         camera-controls
         shadow-intensity="1"
         environment-image="neutral"
-        exposure="1"
+        exposure="1.5"
         shadow-softness="0.5"
         // 아이폰 최적화 설정
         touch-action="pan-y"
@@ -337,7 +337,7 @@ export default function DynamicModelViewer({
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: '#545454'
+          backgroundColor: 'transparent' // 그라데이션 배경이 보이도록 투명하게
         }}
       />
     </div>
