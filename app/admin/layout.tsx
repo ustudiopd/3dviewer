@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
 
@@ -13,13 +13,11 @@ export default function AdminLayout({
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
-    // 현재 경로가 로그인 페이지인지 확인 (클라이언트에서만)
-    const isLoginPage = typeof window !== 'undefined' && window.location.pathname === '/admin/login'
-    
-    // 로그인 페이지인 경우 레이아웃 체크를 건너뛰고 바로 렌더링
-    if (isLoginPage) {
+    // 로그인 페이지인 경우 세션 확인 없이 바로 렌더링
+    if (pathname === '/admin/login') {
       setLoading(false)
       return
     }
@@ -57,10 +55,10 @@ export default function AdminLayout({
     )
 
     return () => subscription.unsubscribe()
-  }, [router])
+  }, [router, pathname])
 
-  // 로그인 페이지인 경우 레이아웃 없이 바로 렌더링 (클라이언트에서만)
-  if (typeof window !== 'undefined' && window.location.pathname === '/admin/login') {
+  // 로그인 페이지인 경우 레이아웃 없이 바로 렌더링
+  if (pathname === '/admin/login') {
     return <>{children}</>
   }
 

@@ -31,17 +31,24 @@ export default function AdminLoginClient() {
       // admin 계정은 이메일 양식 예외 처리
       const loginEmail = email === 'admin' ? 'admin@admin.com' : email
       
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('로그인 시도:', { email, loginEmail, password: '***' })
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password,
       })
 
+      console.log('로그인 결과:', { data, error })
+
       if (error) {
-        setError('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.')
+        console.error('로그인 오류:', error)
+        setError(`로그인에 실패했습니다: ${error.message}`)
       } else {
+        console.log('로그인 성공:', data)
         router.push('/admin/dashboard')
       }
     } catch (err) {
+      console.error('로그인 예외:', err)
       setError('로그인 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
