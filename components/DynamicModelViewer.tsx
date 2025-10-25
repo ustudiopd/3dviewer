@@ -124,9 +124,9 @@ export default function DynamicModelViewer({
     }
   }, [src])
 
-  // 배경색 설정 - 그라데이션 배경
+  // 배경색 설정 - Babylon.js Sandbox 스타일 그라데이션
   const getBackgroundStyle = () => {
-    return 'linear-gradient(135deg, #6b6b6b 0%, #3a3a3a 100%)' // 그라데이션
+    return 'linear-gradient(135deg, #a8abb0 0%, #3a3d40 100%)' // Babylon.js Sandbox 스타일
   }
 
   return (
@@ -317,16 +317,26 @@ export default function DynamicModelViewer({
         </div>
       )}
 
-      {/* model-viewer 컴포넌트 - HTML 파일과 동일 */}
+      {/* model-viewer 컴포넌트 - 바닥 반사 효과 강화 */}
       <model-viewer
         ref={modelViewerRef}
         src={src}
         alt={modelName}
         camera-controls
-        shadow-intensity="1"
-        environment-image="neutral"
-        exposure="1.5"
-        shadow-softness="0.5"
+        // 🔥 강화된 광원 효과 설정
+        shadow-intensity="2.0"           // 그림자 강도 2배 증가
+        exposure="2.5"                    // 노출값 대폭 증가 (1.5 → 2.5)
+        shadow-softness="0.3"             // 그림자 부드러움 조정
+        // 🌟 바닥 반사 효과 강화
+        skybox-image=""                   // 스카이박스 비활성화
+        tone-mapping=""                   // 톤 매핑 비활성화
+        // 반사 효과를 위한 추가 속성
+        min-camera-orbit="auto auto auto"
+        max-camera-orbit="auto auto auto"
+        // 바닥 반사를 위한 환경 설정
+        environment-intensity="2.0"       // 환경 조명 강도 증가
+        // 🌟 강력한 반사 효과를 위한 HDR 환경 맵
+        environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
         // 아이폰 최적화 설정
         touch-action="pan-y"
         interaction-policy="allow-when-focused"
