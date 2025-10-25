@@ -9,7 +9,7 @@ interface DynamicModelViewerProps {
   modelName: string
   demoId?: string
   accessCode?: string
-  backgroundColor?: 'black' | 'gray'
+  backgroundColor?: 'black'
 }
 
 declare global {
@@ -124,12 +124,9 @@ export default function DynamicModelViewer({
     }
   }, [src])
 
-  // 배경색 설정
+  // 배경색 설정 - 진한 회색으로 고정
   const getBackgroundStyle = () => {
-    if (backgroundColor === 'gray') {
-      return '#0a0a0a' // 진한 회색 (솔리드)
-    }
-    return '#0a0a0a' // 진한 회색 (솔리드) - 기본값도 동일하게
+    return '#0a0a0a' // 진한 회색 (솔리드)
   }
 
   return (
