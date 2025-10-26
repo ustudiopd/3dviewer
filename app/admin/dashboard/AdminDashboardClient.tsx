@@ -393,6 +393,12 @@ export default function AdminDashboardClient() {
                           링크 복사
                         </button>
                         <button
+                          onClick={() => window.open(`${window.location.origin}/${demo.access_code}`, '_blank')}
+                          className="text-green-600 hover:text-green-900 text-xs"
+                        >
+                          새창 열기
+                        </button>
+                        <button
                           onClick={() => {
                             setEditingDemo(demo)
                             setEditDemoMemo(demo.memo || '')
@@ -403,7 +409,7 @@ export default function AdminDashboardClient() {
                         </button>
                         <button
                           onClick={() => handleViewAccessLogs(demo.id)}
-                          className="text-green-600 hover:text-green-900 text-xs"
+                          className="text-purple-600 hover:text-purple-900 text-xs"
                         >
                           접속 로그
                         </button>
