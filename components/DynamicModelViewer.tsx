@@ -33,6 +33,7 @@ export default function DynamicModelViewer({
   const [loadingProgress, setLoadingProgress] = useState(0)
   const [loadingStatus, setLoadingStatus] = useState('초기화 중...')
   const [isLoading, setIsLoading] = useState(true)
+  const [showControls, setShowControls] = useState(false)
 
   // 접속 로그 수집 함수
   const logAccess = async () => {
@@ -136,47 +137,63 @@ export default function DynamicModelViewer({
       position: 'relative',
       background: getBackgroundStyle()
     }}>
-        {/* 모델명 표시 - 모바일 최적화 */}
+        {/* 작은 헤더 버튼들 - 상단 왼쪽 */}
         <div style={{
           position: 'absolute',
           top: '10px',
           left: '10px',
-          right: '10px',
           zIndex: 10,
-          background: 'rgba(0, 0, 0, 0.8)',
-          backdropFilter: 'blur(10px)',
-          padding: '12px 16px',
-          borderRadius: '12px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-          border: '1px solid rgba(255,255,255,0.1)'
+          display: 'flex',
+          gap: '8px',
+          alignItems: 'center'
         }}>
-          <h1 style={{ 
-            margin: 0, 
-            fontSize: '16px', 
-            fontWeight: '600', 
-            color: '#ffffff',
-            letterSpacing: '0.5px',
-            lineHeight: '1.2'
-          }}>
-            {modelName}
-          </h1>
-          <p style={{ 
-            margin: '4px 0 0 0', 
-            fontSize: '12px', 
-            color: '#b0b0b0',
-            fontWeight: '400'
-          }}>
-            3Dviewer
-          </p>
-        </div>
+          {/* 모델명 버튼 - 클릭 가능 */}
+          <div 
+            onClick={() => setShowControls(!showControls)}
+            style={{
+              background: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(10px)',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              maxWidth: '200px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+              e.currentTarget.style.transform = 'translateY(-1px)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)'
+              e.currentTarget.style.transform = 'translateY(0)'
+            }}
+          >
+            <h1 style={{ 
+              margin: 0, 
+              fontSize: '14px', 
+              fontWeight: '600', 
+              color: '#ffffff',
+              letterSpacing: '0.3px',
+              lineHeight: '1.2',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}>
+              {modelName}
+            </h1>
+            <p style={{ 
+              margin: '2px 0 0 0', 
+              fontSize: '10px', 
+              color: '#b0b0b0',
+              fontWeight: '400'
+            }}>
+              3Dviewer
+            </p>
+          </div>
 
-        {/* 홈 버튼 - 모바일 최적화 */}
-        <div style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          zIndex: 10
-        }}>
+          {/* 홈 버튼 */}
           <a 
             href="/" 
             style={{
@@ -186,12 +203,14 @@ export default function DynamicModelViewer({
               padding: '8px 12px',
               borderRadius: '8px',
               textDecoration: 'none',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              display: 'block',
               fontWeight: '500',
               fontSize: '12px',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s ease',
+              border: '1px solid rgba(255,255,255,0.1)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
@@ -206,50 +225,67 @@ export default function DynamicModelViewer({
           </a>
         </div>
 
-        {/* 조작 방법 툴팁 - 모바일 최적화 */}
-        <div style={{
-          position: 'absolute',
-          bottom: '10px',
-          left: '10px',
-          right: '10px',
-          zIndex: 10,
-          background: 'rgba(0, 0, 0, 0.8)',
-          backdropFilter: 'blur(10px)',
-          padding: '12px 16px',
-          borderRadius: '12px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-          fontSize: '12px',
-          border: '1px solid rgba(255,255,255,0.1)'
-        }}>
-          <div style={{ 
-            fontWeight: '600', 
-            marginBottom: '8px', 
-            color: '#ffffff',
-            fontSize: '14px',
-            letterSpacing: '0.5px'
+        {/* 조작 방법 툴팁 - 클릭으로 토글 */}
+        {showControls && (
+          <div style={{
+            position: 'absolute',
+            top: '60px',
+            left: '10px',
+            zIndex: 10,
+            background: 'rgba(0, 0, 0, 0.9)',
+            backdropFilter: 'blur(15px)',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+            fontSize: '11px',
+            border: '1px solid rgba(255,255,255,0.2)',
+            opacity: 1,
+            transform: 'translateY(0)',
+            transition: 'all 0.3s ease',
+            pointerEvents: 'auto'
           }}>
-            🎮 조작 방법
+            <div style={{ 
+              fontWeight: '600', 
+              marginBottom: '4px', 
+              color: '#ffffff',
+              fontSize: '12px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span>🎮 조작 방법</span>
+              <button
+                onClick={() => setShowControls(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#ffffff',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  padding: '0',
+                  marginLeft: '8px'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ 
+              display: 'flex', 
+              gap: '12px',
+              fontSize: '10px'
+            }}>
+              <span style={{ color: '#e0e0e0' }}>
+                <strong style={{ color: '#ffffff' }}>드래그:</strong> 회전
+              </span>
+              <span style={{ color: '#e0e0e0' }}>
+                <strong style={{ color: '#ffffff' }}>휠:</strong> 확대/축소
+              </span>
+              <span style={{ color: '#e0e0e0' }}>
+                <strong style={{ color: '#ffffff' }}>우클릭:</strong> 이동
+              </span>
+            </div>
           </div>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '1fr 1fr', 
-            gap: '8px',
-            fontSize: '11px'
-          }}>
-            <div style={{ color: '#e0e0e0', lineHeight: '1.4' }}>
-              <strong style={{ color: '#ffffff' }}>🖱️ 드래그:</strong> 회전
-            </div>
-            <div style={{ color: '#e0e0e0', lineHeight: '1.4' }}>
-              <strong style={{ color: '#ffffff' }}>🔄 휠:</strong> 확대/축소
-            </div>
-            <div style={{ color: '#e0e0e0', lineHeight: '1.4' }}>
-              <strong style={{ color: '#ffffff' }}>🖱️ 우클릭:</strong> 이동
-            </div>
-            <div style={{ color: '#e0e0e0', lineHeight: '1.4' }}>
-              <strong style={{ color: '#ffffff' }}>📱 터치:</strong> 핀치 줌
-            </div>
-          </div>
-        </div>
+        )}
 
       {/* 로딩 진행률 표시 */}
       {isLoading && (
