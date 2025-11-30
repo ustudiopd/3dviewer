@@ -33,39 +33,55 @@ if (!supabaseUrl || !supabaseServiceKey) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-async function createTestAdmin() {
+async function createAdminAccount(email, password) {
   try {
-    console.log('🔐 테스트 어드민 계정 생성 중...')
+    // 기존 계정이 있는지 확인 (listUsers로 확인)
+    const { data: users, error: listError } = await supabase.auth.admin.listUsers()
     
-    // 기존 계정이 있는지 확인
-    const { data: existingUser, error: checkError } = await supabase.auth.admin.getUserByEmail('test@uslab.ai')
-    
-    if (existingUser.user) {
-      console.log('⚠️  test@uslab.ai 계정이 이미 존재합니다.')
-      console.log('계정 ID:', existingUser.user.id)
-      return
+    if (!listError && users) {
+      const existingUser = users.users.find(u => u.email === email)
+      if (existingUser) {
+        console.log(`⚠️  ${email} 계정이 이미 존재합니다.`)
+        console.log('계정 ID:', existingUser.id)
+        return { exists: true, user: existingUser }
+      }
     }
     
     // 새 계정 생성
     const { data, error } = await supabase.auth.admin.createUser({
-      email: 'test@uslab.ai',
-      password: 'test321',
+      email: email,
+      password: password,
       email_confirm: true
     })
     
     if (error) {
-      console.error('❌ 계정 생성 실패:', error.message)
-      return
+      console.error(`❌ ${email} 계정 생성 실패:`, error.message)
+      return { success: false, error }
     }
     
-    console.log('✅ 테스트 어드민 계정이 성공적으로 생성되었습니다!')
+    console.log(`✅ ${email} 계정이 성공적으로 생성되었습니다!`)
     console.log('📧 이메일:', data.user.email)
     console.log('🆔 사용자 ID:', data.user.id)
-    console.log('🔑 비밀번호: test321')
+    console.log(`🔑 비밀번호: ${password}`)
+    return { success: true, user: data.user }
     
   } catch (error) {
-    console.error('❌ 오류 발생:', error.message)
+    console.error(`❌ ${email} 계정 생성 중 오류 발생:`, error.message)
+    return { success: false, error }
   }
+}
+
+async function createTestAdmin() {
+  console.log('🔐 관리자 계정 생성 중...\n')
+  
+  // test@uslab.ai 계정 생성
+  console.log('1️⃣ test@uslab.ai 계정 생성 중...')
+  await createAdminAccount('test@uslab.ai', 'test321')
+  
+  console.log('\n2️⃣ admin@admin.com 계정 생성 중...')
+  await createAdminAccount('admin@admin.com', 'admin123')
+  
+  console.log('\n✅ 모든 관리자 계정 생성 완료!')
 }
 
 createTestAdmin()

@@ -34,13 +34,14 @@ export default function CreateDemoModal({ models, onClose, onSuccess }: CreateDe
 
       // 고유한 코드 생성 (최대 10번 시도)
       while (!isUnique && attempts < 10) {
-        const { data: existing } = await supabase
+        const { data: existing, error: checkError } = await supabase
           .from('demos')
           .select('id')
           .eq('access_code', accessCode)
-          .single()
+          .maybeSingle()
 
-        if (!existing) {
+        // 오류가 발생하거나 데이터가 없으면 고유한 것으로 간주
+        if (checkError || !existing) {
           isUnique = true
         } else {
           accessCode = generateAccessCode()
@@ -58,17 +59,15 @@ export default function CreateDemoModal({ models, onClose, onSuccess }: CreateDe
         throw new Error('로그인이 필요합니다.')
       }
 
-      // 데모 생성
-      const { error: createError } = await supabase
-        .from('demos')
-        .insert({
-          model_id: selectedModelId,
-          access_code: accessCode,
-          is_active: true,
-          expires_at: expiresAt || null,
-          created_by: user.id,
-          access_count: 0
-        })
+      // 데모 생성 (RPC 함수 사용)
+      const { error: createError } = await supabase.rpc('insert_demo', {
+        p_model_id: selectedModelId,
+        p_access_code: accessCode,
+        p_is_active: true,
+        p_expires_at: expiresAt || null,
+        p_created_by: user.id,
+        p_access_count: 0
+      })
 
       if (createError) {
         throw new Error(createError.message)

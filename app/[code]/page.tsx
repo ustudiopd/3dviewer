@@ -63,19 +63,13 @@ export default async function ModelViewerPage({ params }: PageProps) {
   try {
     console.log('데모 조회 시작 - 코드:', code.toUpperCase())
     
-    // 데모 정보 조회
-    const { data: demo, error: demoError } = await supabaseServer
-      .from('demos')
-      .select(`
-        *,
-        model:models(*)
-      `)
-      .eq('access_code', code.toUpperCase())
-      .single()
+    // 데모와 모델 정보를 함께 조회 (RPC 함수 사용)
+    const { data: rpcResult, error: demoError } = await supabaseServer
+      .rpc('get_demo_with_model', { p_access_code: code.toUpperCase() })
 
-    console.log('데모 조회 결과:', { demo, demoError })
+    console.log('데모 조회 결과:', { rpcResult, demoError })
 
-    if (demoError || !demo) {
+    if (demoError || !rpcResult) {
       console.error('데모 조회 오류:', demoError)
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -88,6 +82,41 @@ export default async function ModelViewerPage({ params }: PageProps) {
                 <p className="text-red-800 text-sm">오류: {demoError.message}</p>
               </div>
             )}
+            <a href="/" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+              홈으로 돌아가기
+            </a>
+          </div>
+        </div>
+      )
+    }
+
+    // RPC 함수는 JSONB를 반환하므로 직접 접근
+    const result = rpcResult as any
+    const demo = result?.demo
+    const model = result?.model
+
+    if (!demo) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">접속 코드를 찾을 수 없습니다</h1>
+            <p className="text-gray-600 mb-2">코드: {code.toUpperCase()}</p>
+            <p className="text-gray-600 mb-6">올바른 8자리 코드를 입력해주세요.</p>
+            <a href="/" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+              홈으로 돌아가기
+            </a>
+          </div>
+        </div>
+      )
+    }
+
+    // 모델 정보 확인
+    if (!model) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">모델을 찾을 수 없습니다</h1>
+            <p className="text-gray-600 mb-6">이 데모에 연결된 모델이 존재하지 않습니다.</p>
             <a href="/" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
               홈으로 돌아가기
             </a>
@@ -126,26 +155,11 @@ export default async function ModelViewerPage({ params }: PageProps) {
       )
     }
 
-    // 모델 정보 확인
-    if (!demo.model) {
-      return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">모델을 찾을 수 없습니다</h1>
-            <p className="text-gray-600 mb-6">연결된 3D 모델이 존재하지 않습니다.</p>
-            <a href="/" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
-              홈으로 돌아가기
-            </a>
-          </div>
-        </div>
-      )
-    }
-
-      // Signed URL 생성 (1시간 유효)
-      console.log('Signed URL 생성 시작 - 경로:', demo.model.storage_path)
-      const { data: signedUrlData, error: urlError } = await supabaseServer.storage
-        .from('glb-models-private')
-        .createSignedUrl(demo.model.storage_path, 3600) // 1시간
+    // Signed URL 생성 (1시간 유효)
+    console.log('Signed URL 생성 시작 - 경로:', model.storage_path)
+    const { data: signedUrlData, error: urlError } = await supabaseServer.storage
+      .from('glb-models-private')
+      .createSignedUrl(model.storage_path, 3600) // 1시간
 
     console.log('Signed URL 생성 결과:', { signedUrlData, urlError })
 
@@ -155,7 +169,7 @@ export default async function ModelViewerPage({ params }: PageProps) {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">모델 로딩 오류</h1>
-            <p className="text-gray-600 mb-2">모델 경로: {demo.model.storage_path}</p>
+            <p className="text-gray-600 mb-2">모델 경로: {model.storage_path}</p>
             <p className="text-gray-600 mb-6">3D 모델을 불러올 수 없습니다.</p>
             {urlError && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 max-w-md mx-auto">
@@ -170,14 +184,12 @@ export default async function ModelViewerPage({ params }: PageProps) {
       )
     }
 
-    // 접근 통계 업데이트
-    await supabaseServer
-      .from('demos')
-      .update({
-        access_count: demo.access_count + 1,
-        last_accessed_at: new Date().toISOString()
-      })
-      .eq('id', demo.id)
+    // 접근 통계 업데이트 (RPC 함수 사용)
+    await supabaseServer.rpc('update_demo', {
+      p_id: demo.id,
+      p_access_count: demo.access_count + 1,
+      p_last_accessed_at: new Date().toISOString()
+    })
 
     // 접속 로그 수집 (클라이언트에서 실행)
     console.log('접속 로그 수집 시작')
@@ -185,9 +197,9 @@ export default async function ModelViewerPage({ params }: PageProps) {
     return (
       <DynamicModelViewer
         src={signedUrlData.signedUrl}
-        isDraco={demo.model.is_draco_compressed}
-        isKtx2={demo.model.is_ktx2}
-        modelName={demo.model.name}
+        isDraco={model.is_draco_compressed}
+        isKtx2={model.is_ktx2}
+        modelName={model.name}
         demoId={demo.id}
         accessCode={demo.access_code}
       />

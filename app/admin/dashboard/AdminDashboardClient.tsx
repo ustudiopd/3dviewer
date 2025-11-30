@@ -78,18 +78,21 @@ export default function AdminDashboardClient() {
     if (!confirm('정말로 이 모델을 삭제하시겠습니까?')) return
 
     try {
-      const { error } = await supabase
-        .from('models')
-        .delete()
-        .eq('id', modelId)
-
-      if (error) throw error
-      
-      // 관련 데모도 삭제
-      await supabase
+      // 관련 데모 먼저 삭제
+      const { data: demos } = await supabase
         .from('demos')
-        .delete()
+        .select('id')
         .eq('model_id', modelId)
+      
+      if (demos && demos.length > 0) {
+        for (const demo of demos) {
+          await supabase.rpc('delete_demo', { p_id: demo.id })
+        }
+      }
+      
+      // 모델 삭제
+      const { error } = await supabase.rpc('delete_model', { p_id: modelId })
+      if (error) throw error
 
       loadData()
     } catch (error) {
@@ -101,10 +104,10 @@ export default function AdminDashboardClient() {
   // 모델명 수정
   const handleEditModelName = async (modelId: string, newName: string) => {
     try {
-      const { error } = await supabase
-        .from('models')
-        .update({ name: newName })
-        .eq('id', modelId)
+      const { error } = await supabase.rpc('update_model', {
+        p_id: modelId,
+        p_name: newName
+      })
 
       if (error) throw error
       
@@ -120,10 +123,10 @@ export default function AdminDashboardClient() {
   // 데모 메모 수정
   const handleEditDemoMemo = async (demoId: string, memo: string) => {
     try {
-      const { error } = await supabase
-        .from('demos')
-        .update({ memo })
-        .eq('id', demoId)
+      const { error } = await supabase.rpc('update_demo', {
+        p_id: demoId,
+        p_memo: memo
+      })
 
       if (error) throw error
       
@@ -141,10 +144,7 @@ export default function AdminDashboardClient() {
     if (!confirm('정말로 이 데모를 삭제하시겠습니까?')) return
 
     try {
-      const { error } = await supabase
-        .from('demos')
-        .delete()
-        .eq('id', demoId)
+      const { error } = await supabase.rpc('delete_demo', { p_id: demoId })
 
       if (error) throw error
       

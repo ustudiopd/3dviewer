@@ -1,5 +1,32 @@
 # 완료된 작업 내역 (Progress)
 
+## [2024-11-30]
+- **Supabase 프로젝트 마이그레이션**: 
+  - 기존 3Dviewer 프로젝트에서 uslab 프로젝트로 마이그레이션 완료
+  - 프로젝트 ID: `xiygbsaewuqocaxoxeqn`
+  - DB 데이터 초기화 완료
+- **RLS 정책 및 RPC 함수 구현**: 
+  - 모든 INSERT/UPDATE/DELETE 작업을 RPC 함수로 전환
+  - `insert_model`, `update_model`, `delete_model` 함수 생성
+  - `insert_demo`, `update_demo`, `delete_demo` 함수 생성
+  - `insert_access_log` 함수 생성
+  - `get_demo_by_code`, `get_demo_with_model` 함수 생성
+  - 모든 RPC 함수에 `SECURITY DEFINER` 설정으로 권한 문제 해결
+- **Public 뷰 재생성**: 
+  - `public.models`, `public.demos`, `public.access_logs` 뷰 재생성
+  - `security_invoker = true` 설정으로 RLS 정책 올바르게 적용
+  - 모든 역할(anon, authenticated, service_role)에 SELECT 권한 부여
+- **Storage 버킷 설정**: 
+  - 파일 크기 제한 5GB로 증가
+  - 버킷 이름: `glb-models-private`
+- **데모 생성 및 조회 기능 개선**: 
+  - 데모 생성 시 고유 코드 확인 로직 개선 (`.maybeSingle()` 사용)
+  - 데모 조회 시 RPC 함수 사용으로 권한 문제 해결
+  - 모델 조회도 RPC 함수로 통합하여 한 번의 호출로 처리
+- **코드 품질 개선**: 
+  - `.single()` 대신 `.maybeSingle()` 사용으로 오류 처리 개선
+  - RPC 함수를 통한 데이터 접근으로 권한 문제 완전 해결
+
 ## [2024-12-19]  
 - **3D 뷰어 UI 리팩토링**: 
   - 헤더를 작은 버튼 형태로 변경 (상단 왼쪽 배치)

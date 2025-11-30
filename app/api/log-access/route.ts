@@ -20,16 +20,14 @@ export async function POST(request: NextRequest) {
     const realIp = request.headers.get('x-real-ip')
     const clientIp = forwarded?.split(',')[0] || realIp || 'unknown'
 
-    // 접속 로그 저장
-    const { error } = await supabaseServer
-      .from('access_logs')
-      .insert({
-        demo_id: demoId,
-        access_code: accessCode,
-        user_ip: clientIp,
-        user_agent: userAgent,
-        accessed_at: new Date().toISOString()
-      })
+    // 접속 로그 저장 (RPC 함수 사용)
+    const { error } = await supabaseServer.rpc('insert_access_log', {
+      p_demo_id: demoId,
+      p_access_code: accessCode,
+      p_user_ip: clientIp !== 'unknown' ? clientIp : null,
+      p_user_agent: userAgent,
+      p_accessed_at: new Date().toISOString()
+    })
 
     if (error) {
       console.error('접속 로그 저장 오류:', error)

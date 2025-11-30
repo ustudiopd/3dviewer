@@ -24,7 +24,7 @@ export default function FileUploadModal({ onClose, onSuccess }: FileUploadModalP
     if (rejectedFiles.length > 0) {
       const rejection = rejectedFiles[0]
       if (rejection.errors[0]?.code === 'file-too-large') {
-        setError('파일 크기가 1GB를 초과합니다.')
+        setError('파일 크기가 5GB를 초과합니다.')
       } else if (rejection.errors[0]?.code === 'file-invalid-type') {
         setError('GLB 파일만 업로드 가능합니다.')
       } else {
@@ -55,7 +55,7 @@ export default function FileUploadModal({ onClose, onSuccess }: FileUploadModalP
       'application/octet-stream': ['.glb'],
       'application/gltf-binary': ['.glb']
     },
-    maxSize: 1024 * 1024 * 1024, // 1GB
+    maxSize: 5 * 1024 * 1024 * 1024, // 5GB
     multiple: false
   })
 
@@ -138,25 +138,25 @@ export default function FileUploadModal({ onClose, onSuccess }: FileUploadModalP
         setProgress(i)
       }
 
-      // 6단계: 데이터베이스 저장 (95%)
+      // 6단계: 데이터베이스 저장 (95%) - RPC 함수 사용
       setStatus('설정을 등록하는 중...')
-      const { error: dbError } = await supabase
-        .from('models')
-        .insert({
-          name: name.trim(),
-          storage_path: data.path,
-          file_size_bytes: file.size,
-          is_draco_compressed: isDracoCompressed,
-          is_ktx2: false // 기본값
-        })
+      const { data: modelId, error: rpcError } = await supabase.rpc('insert_model', {
+        p_name: name.trim(),
+        p_storage_path: data.path,
+        p_file_size_bytes: file.size,
+        p_is_draco_compressed: isDracoCompressed,
+        p_is_ktx2: false // 기본값
+      })
 
-      if (dbError) {
+      if (rpcError) {
         // 업로드된 파일 삭제
         await supabase.storage
           .from('glb-models-private')
           .remove([data.path])
-        throw new Error(dbError.message)
+        throw new Error(rpcError.message)
       }
+
+      // RPC 함수가 성공하면 모델이 생성된 것이므로 추가 확인 불필요
 
       // 7단계: 완료 (100%) - 점진적으로 증가
       for (let i = 95; i <= 100; i++) {

@@ -53,16 +53,19 @@
 
 ## 4. 보안 패턴
 - **인증**: 
-  - 관리자 비밀번호는 환경 변수로 관리
+  - Supabase Auth를 통한 관리자 로그인
   - 서버 사이드 세션 검증
   - API Routes에서 인증 확인
 - **데이터 접근**: 
   - Row Level Security (RLS) 정책 활용
+  - 모든 INSERT/UPDATE/DELETE 작업은 RPC 함수를 통해 수행
+  - RPC 함수는 `SECURITY DEFINER`로 실행되어 권한 문제 해결
+  - Public 뷰를 통한 SELECT 작업 (security_invoker = true)
   - Service Role Key는 서버 사이드에서만 사용
   - 클라이언트는 Anon Key만 사용
 - **파일 업로드**: 
   - 파일 타입 검증 (GLB/GLTF만 허용)
-  - 파일 크기 제한
+  - 파일 크기 제한 (5GB)
   - Supabase Storage 버킷 정책 설정
 
 ## 5. 성능 최적화
